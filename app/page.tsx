@@ -356,7 +356,7 @@ export default function Home() {
           leaderboard={leaderboard}
           onLoadLeaderboard={loadLeaderboard}
           currentUser={currentUser}
-          isOnline={isOnline}
+          isOnline={Boolean(isOnline)}
         />
       )}
 
@@ -581,7 +581,7 @@ export default function Home() {
         onClose={() => setShowLogin(false)}
         isLoading={isSyncing}
         error={syncError}
-        isOnline={isOnline}
+        isOnline={Boolean(isOnline)}
       />
 
       {/* Stats Panel */}
