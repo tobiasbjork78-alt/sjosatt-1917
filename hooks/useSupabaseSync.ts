@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { SupabaseService, DatabaseProfile, LeaderboardEntry } from '@/lib/supabase';
+import { SupabaseService, DatabaseProfile, LeaderboardEntry, isSupabaseConfigured } from '@/lib/supabase';
 import { UserProgress } from '@/types/achievements';
 import { GameState } from '@/types/game';
 
 export function useSupabaseSync() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(isSupabaseConfigured);
   const [isSyncing, setIsSyncing] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [syncError, setSyncError] = useState<string | null>(null);
@@ -30,16 +30,22 @@ export function useSupabaseSync() {
     setSyncError(null);
 
     try {
-      // Check if profile exists
-      let profile = await SupabaseService.getProfile(username);
+      if (isSupabaseConfigured) {
+        // Online mode with Supabase
+        // Check if profile exists
+        let profile = await SupabaseService.getProfile(username);
 
-      // If profile doesn't exist, create it
-      if (!profile) {
-        profile = await SupabaseService.createProfile(username);
+        // If profile doesn't exist, create it
         if (!profile) {
-          setSyncError('Kunde inte skapa profil');
-          return false;
+          profile = await SupabaseService.createProfile(username);
+          if (!profile) {
+            setSyncError('Kunde inte skapa profil online');
+            return false;
+          }
         }
+      } else {
+        // Offline mode - just use localStorage
+        console.log('Offline mode: Saving username to localStorage only');
       }
 
       setCurrentUser(username);

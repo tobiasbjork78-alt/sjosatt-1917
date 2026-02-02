@@ -8,9 +8,10 @@ interface LoginModalProps {
   onClose: () => void;
   isLoading: boolean;
   error: string | null;
+  isOnline?: boolean;
 }
 
-export default function LoginModal({ isOpen, onLogin, onClose, isLoading, error }: LoginModalProps) {
+export default function LoginModal({ isOpen, onLogin, onClose, isLoading, error, isOnline = true }: LoginModalProps) {
   const [username, setUsername] = useState('');
 
   if (!isOpen) return null;
@@ -30,10 +31,22 @@ export default function LoginModal({ isOpen, onLogin, onClose, isLoading, error 
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-gradient-to-br from-gray-900/90 to-purple-900/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-2xl max-w-md w-full mx-4">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2">Logga in eller Registrera</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            {isOnline ? 'Logga in eller Registrera' : 'Offline-läge'}
+          </h2>
           <p className="text-gray-300 text-sm">
-            Spara dina framsteg online och tävla med andra!
+            {isOnline
+              ? 'Spara dina framsteg online och tävla med andra!'
+              : 'Online-funktioner ej tillgängliga. Spelar endast lokalt med localStorage.'
+            }
           </p>
+          {!isOnline && (
+            <div className="mt-3 p-3 bg-yellow-500/20 border border-yellow-400 rounded-lg">
+              <p className="text-yellow-200 text-xs">
+                ⚠️ Supabase ej konfigurerad. Alla framsteg sparas lokalt.
+              </p>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

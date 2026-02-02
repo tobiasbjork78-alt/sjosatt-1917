@@ -1,9 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Check if Supabase is properly configured
+export const isSupabaseConfigured =
+  supabaseUrl &&
+  supabaseAnonKey &&
+  supabaseUrl !== 'https://your-project.supabase.co' &&
+  supabaseAnonKey !== 'your-anon-key' &&
+  supabaseUrl.includes('.supabase.co');
+
+export const supabase = isSupabaseConfigured
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 export interface DatabaseProfile {
   id: string;
@@ -49,6 +59,11 @@ export interface LeaderboardEntry {
 
 export class SupabaseService {
   static async createProfile(username: string): Promise<DatabaseProfile | null> {
+    if (!supabase || !isSupabaseConfigured) {
+      console.warn('Supabase not configured, skipping profile creation');
+      return null;
+    }
+
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -82,6 +97,11 @@ export class SupabaseService {
   }
 
   static async getProfile(username: string): Promise<DatabaseProfile | null> {
+    if (!supabase || !isSupabaseConfigured) {
+      console.warn('Supabase not configured, skipping profile get');
+      return null;
+    }
+
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -106,6 +126,11 @@ export class SupabaseService {
   }
 
   static async updateProfile(username: string, updates: Partial<DatabaseProfile>): Promise<boolean> {
+    if (!supabase || !isSupabaseConfigured) {
+      console.warn('Supabase not configured, skipping profile update');
+      return false;
+    }
+
     try {
       const { error } = await supabase
         .from('profiles')
@@ -125,6 +150,11 @@ export class SupabaseService {
   }
 
   static async saveSession(profileId: string, sessionData: Omit<DatabaseSession, 'id' | 'profile_id' | 'created_at'>): Promise<boolean> {
+    if (!supabase || !isSupabaseConfigured) {
+      console.warn('Supabase not configured, skipping session save');
+      return false;
+    }
+
     try {
       const { error } = await supabase
         .from('sessions')
@@ -146,6 +176,11 @@ export class SupabaseService {
   }
 
   static async getLeaderboard(category: 'wpm' | 'accuracy' | 'points' | 'level' = 'points', limit: number = 10): Promise<LeaderboardEntry[]> {
+    if (!supabase || !isSupabaseConfigured) {
+      console.warn('Supabase not configured, returning empty leaderboard');
+      return [];
+    }
+
     try {
       let orderColumn = 'total_points';
       if (category === 'wpm') orderColumn = 'highest_wpm';
@@ -171,6 +206,11 @@ export class SupabaseService {
   }
 
   static async getUserStats(username: string): Promise<{ sessions: DatabaseSession[]; profile: DatabaseProfile | null }> {
+    if (!supabase || !isSupabaseConfigured) {
+      console.warn('Supabase not configured, returning empty stats');
+      return { sessions: [], profile: null };
+    }
+
     try {
       const profile = await this.getProfile(username);
       if (!profile) {

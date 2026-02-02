@@ -262,10 +262,15 @@ export default function Home() {
         <div className={`flex-1 ${themeClasses.card} rounded-lg p-4`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-400' : 'bg-red-400'}`}></div>
+              <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
               <span className={`${themeClasses.text} font-medium`}>
                 {currentUser ? `Inloggad som ${currentUser}` : 'Spelar lokalt'}
               </span>
+              {!isOnline && (
+                <span className="text-yellow-400 text-xs bg-yellow-400/20 px-2 py-1 rounded">
+                  Offline-läge
+                </span>
+              )}
               {isSyncing && <div className="text-blue-400 animate-pulse text-sm">Synkar...</div>}
             </div>
 
@@ -284,12 +289,20 @@ export default function Home() {
               </button>
               <button
                 onClick={() => {
-                  setShowMultiplayer(true);
-                  loadAvailableRooms();
+                  if (isOnline) {
+                    setShowMultiplayer(true);
+                    loadAvailableRooms();
+                  }
                 }}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                disabled={!isOnline}
+                className={`px-4 py-2 rounded-lg transition-colors text-sm ${
+                  isOnline
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                }`}
+                title={isOnline ? 'Multiplayer' : 'Multiplayer ej tillgängligt i offline-läge'}
               >
-                👥 Multiplayer
+                👥 {isOnline ? 'Multiplayer' : 'Multiplayer (Offline)'}
               </button>
 
               {!currentUser ? (
@@ -302,10 +315,20 @@ export default function Home() {
               ) : (
                 <>
                   <button
-                    onClick={() => setShowLeaderboard(!showLeaderboard)}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                    onClick={() => {
+                      if (isOnline) {
+                        setShowLeaderboard(!showLeaderboard);
+                      }
+                    }}
+                    disabled={!isOnline}
+                    className={`px-4 py-2 rounded-lg transition-colors text-sm ${
+                      isOnline
+                        ? 'bg-purple-600 text-white hover:bg-purple-700'
+                        : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                    }`}
+                    title={isOnline ? 'Topplista' : 'Topplista ej tillgänglig i offline-läge'}
                   >
-                    🏆 Topplista
+                    🏆 {isOnline ? 'Topplista' : 'Topplista (Offline)'}
                   </button>
                   <button
                     onClick={logout}
@@ -558,6 +581,7 @@ export default function Home() {
         onClose={() => setShowLogin(false)}
         isLoading={isSyncing}
         error={syncError}
+        isOnline={isOnline}
       />
 
       {/* Stats Panel */}
