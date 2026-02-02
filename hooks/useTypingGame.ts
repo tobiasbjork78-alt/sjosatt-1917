@@ -279,9 +279,13 @@ export function useTypingGame() {
     ? (gameState.currentIndex / gameState.currentText.length) * 100
     : 0;
 
-  // Get problematic keys (lowest accuracy)
+  // Get problematic keys (only keys with real problems)
   const problematicKeys = Object.entries(gameState.stats.keyStats)
-    .filter(([_, stats]) => stats.accuracy < 80 && (stats.correct + stats.incorrect) >= 3)
+    .filter(([_, stats]) =>
+      stats.incorrect >= 2 && // Must have missed at least 2 times
+      stats.accuracy < 60 && // Must have accuracy below 60%
+      (stats.correct + stats.incorrect) >= 5 // Must have typed at least 5 times
+    )
     .sort(([_, a], [__, b]) => a.accuracy - b.accuracy)
     .slice(0, 3)
     .map(([key]) => key);

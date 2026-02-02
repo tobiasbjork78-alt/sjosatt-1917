@@ -173,27 +173,56 @@ export default function Home() {
 
   const themeClasses = getThemeClasses();
 
+  // Handle game mode keyboard shortcuts (1-7 keys and Enter)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle shortcuts when game is not active
+      if (gameState.isActive) return;
+
+      const key = event.key;
+
+      // Handle number keys 1-7 for game mode selection
+      if (key >= '1' && key <= '7') {
+        const modeIndex = parseInt(key) - 1;
+        if (modeIndex < GAME_MODES.length) {
+          setGameMode(GAME_MODES[modeIndex].key);
+          event.preventDefault();
+        }
+      }
+
+      // Handle Enter key to start game
+      if (key === 'Enter') {
+        startGame();
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState.isActive, setGameMode, startGame]);
+
   return (
     <ThemeProvider>
       <div className="space-y-6">
       {/* Game Mode Selection */}
       {!gameState.isActive && (
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-          <h2 className="text-lg font-bold text-white mb-4 text-center">Välj träningsläge</h2>
+        <div className={`${themeClasses.card} rounded-lg p-4`}>
+          <h2 className={`text-lg font-bold ${themeClasses.text} mb-4 text-center`}>Välj träningsläge</h2>
           <div className="grid grid-cols-2 md:grid-cols-7 gap-2">
-            {GAME_MODES.map((mode) => (
+            {GAME_MODES.map((mode, index) => (
               <button
                 key={mode.key}
                 onClick={() => setGameMode(mode.key)}
                 className={`p-3 rounded-lg border-2 transition-all duration-200 text-center ${
                   gameMode === mode.key
-                    ? 'border-blue-400 bg-blue-500/20 text-white'
-                    : 'border-white/20 bg-white/5 text-gray-300 hover:border-white/40 hover:bg-white/10'
+                    ? `border-blue-400 bg-blue-500/20 ${themeClasses.text}`
+                    : `border-white/20 bg-white/5 ${themeClasses.accent} hover:border-white/40 hover:bg-white/10`
                 }`}
               >
                 <div className="text-2xl mb-1">{mode.icon}</div>
                 <div className="font-bold text-sm">{mode.label}</div>
                 <div className="text-xs opacity-80">{mode.description}</div>
+                <div className="text-xs opacity-60 mt-1">Tryck {index + 1}</div>
               </button>
             ))}
           </div>
@@ -202,11 +231,11 @@ export default function Home() {
 
       {/* User Status & Online Features */}
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1 bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10">
+        <div className={`flex-1 ${themeClasses.card} rounded-lg p-4`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-400' : 'bg-red-400'}`}></div>
-              <span className="text-white font-medium">
+              <span className={`${themeClasses.text} font-medium`}>
                 {currentUser ? `Inloggad som ${currentUser}` : 'Spelar lokalt'}
               </span>
               {isSyncing && <div className="text-blue-400 animate-pulse text-sm">Synkar...</div>}
@@ -282,43 +311,43 @@ export default function Home() {
 
       {/* Game Stats */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10 text-center">
-          <div className="text-2xl font-bold text-green-400">{gameState.stats.wpm}</div>
-          <div className="text-sm text-blue-200">WPM</div>
+        <div className={`${themeClasses.card} rounded-lg p-4 text-center`}>
+          <div className={`text-2xl font-bold ${themeClasses.success}`}>{gameState.stats.wpm}</div>
+          <div className={`text-sm ${themeClasses.accent}`}>WPM</div>
         </div>
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10 text-center">
+        <div className={`${themeClasses.card} rounded-lg p-4 text-center`}>
           <div className="text-2xl font-bold text-blue-400">{gameState.stats.accuracy}%</div>
-          <div className="text-sm text-blue-200">Noggrannhet</div>
+          <div className={`text-sm ${themeClasses.accent}`}>Noggrannhet</div>
         </div>
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10 text-center">
+        <div className={`${themeClasses.card} rounded-lg p-4 text-center`}>
           <div className="text-2xl font-bold text-purple-400">{gameState.level}</div>
-          <div className="text-sm text-blue-200">Nivå</div>
+          <div className={`text-sm ${themeClasses.accent}`}>Nivå</div>
         </div>
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10 text-center">
-          <div className="text-2xl font-bold text-yellow-400">{gameState.score}</div>
-          <div className="text-sm text-blue-200">Poäng</div>
+        <div className={`${themeClasses.card} rounded-lg p-4 text-center`}>
+          <div className={`text-2xl font-bold ${themeClasses.warning}`}>{gameState.score}</div>
+          <div className={`text-sm ${themeClasses.accent}`}>Poäng</div>
         </div>
-        <div className={`bg-black/20 backdrop-blur-sm rounded-lg p-4 border text-center transition-all duration-300 ${
-          gameState.stats.currentCombo > 10 ? 'border-orange-400 bg-orange-500/20' : 'border-white/10'
+        <div className={`${themeClasses.card} rounded-lg p-4 text-center transition-all duration-300 ${
+          gameState.stats.currentCombo > 10 ? 'border-orange-400 bg-orange-500/20' : ''
         }`}>
-          <div className={`text-2xl font-bold ${gameState.stats.currentCombo > 10 ? 'text-orange-400 animate-pulse' : 'text-red-400'}`}>
+          <div className={`text-2xl font-bold ${gameState.stats.currentCombo > 10 ? 'text-orange-400 animate-pulse' : themeClasses.error}`}>
             {gameState.stats.currentCombo}
           </div>
-          <div className="text-sm text-blue-200">Combo</div>
+          <div className={`text-sm ${themeClasses.accent}`}>Combo</div>
           {gameState.stats.currentCombo > 10 && (
             <div className="text-xs text-orange-300">+{gameState.stats.comboPoints}</div>
           )}
         </div>
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10 text-center">
+        <div className={`${themeClasses.card} rounded-lg p-4 text-center`}>
           <div className="text-2xl font-bold text-indigo-400">{userProgress.currentStreak}</div>
-          <div className="text-sm text-blue-200">Streak</div>
+          <div className={`text-sm ${themeClasses.accent}`}>Streak</div>
         </div>
       </div>
 
       {/* Problematic Keys Alert */}
       {problematicKeys.length > 0 && gameState.isActive && (
         <div className="bg-orange-500/20 border border-orange-400 rounded-lg p-4">
-          <h3 className="text-orange-300 font-bold mb-2">⚠️ Träna mer på dessa tangenter:</h3>
+          <h3 className={`${themeClasses.warning} font-bold mb-2`}>⚠️ Träna mer på dessa tangenter:</h3>
           <div className="flex gap-2">
             {problematicKeys.map(key => (
               <span key={key} className="bg-orange-400/20 text-orange-200 px-2 py-1 rounded font-mono text-sm">
@@ -330,9 +359,9 @@ export default function Home() {
       )}
 
       {/* Text Display */}
-      <div className="bg-black/20 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+      <div className={`${themeClasses.card} rounded-lg p-6`}>
         <div className="text-center mb-4">
-          <h2 className="text-xl font-bold text-white mb-2">
+          <h2 className={`text-xl font-bold ${themeClasses.text} mb-2`}>
             {currentModeInfo.icon} {currentModeInfo.label} - Nivå {gameState.level}
           </h2>
           <div className="w-full bg-gray-700 rounded-full h-3 mb-4">
@@ -426,19 +455,19 @@ export default function Home() {
 
       {/* Instructions and Tips */}
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-          <h3 className="font-bold text-white mb-2">📚 Instruktioner</h3>
-          <div className="text-sm text-blue-200 space-y-1">
-            <p>• Välj ett träningsläge ovan</p>
-            <p>• Tryck &quot;Starta&quot; och börja skriva</p>
+        <div className={`${themeClasses.card} rounded-lg p-4`}>
+          <h3 className={`font-bold ${themeClasses.text} mb-2`}>📚 Instruktioner</h3>
+          <div className={`text-sm ${themeClasses.accent} space-y-1`}>
+            <p>• Välj ett träningsläge (tryck 1-7)</p>
+            <p>• Tryck Enter eller &quot;Starta&quot; för att börja</p>
             <p>• Följ färgkodningen på tangentbordet</p>
             <p>• Sikta på 85%+ noggrannhet för att gå upp i nivå</p>
           </div>
         </div>
 
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-          <h3 className="font-bold text-white mb-2">💡 Tips</h3>
-          <div className="text-sm text-blue-200 space-y-1">
+        <div className={`${themeClasses.card} rounded-lg p-4`}>
+          <h3 className={`font-bold ${themeClasses.text} mb-2`}>💡 Tips</h3>
+          <div className={`text-sm ${themeClasses.accent} space-y-1`}>
             <p>• Hemrader: A S D F - J K L ;</p>
             <p>• Använd rätt finger för varje tangent</p>
             <p>• Fokusera på noggrannhet före hastighet</p>
@@ -449,15 +478,15 @@ export default function Home() {
 
       {/* Key Statistics (when game is active) */}
       {gameState.isActive && Object.keys(gameState.stats.keyStats).length > 0 && (
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-          <h3 className="font-bold text-white mb-3">📊 Tangenstatistik</h3>
+        <div className={`${themeClasses.card} rounded-lg p-4`}>
+          <h3 className={`font-bold ${themeClasses.text} mb-3`}>📊 Tangenstatistik</h3>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
             {Object.entries(gameState.stats.keyStats)
               .sort(([a], [b]) => a.localeCompare(b))
               .slice(0, 16)
               .map(([key, stats]) => (
                 <div key={key} className="text-center p-2 bg-gray-800/50 rounded">
-                  <div className="font-mono font-bold text-white">
+                  <div className={`font-mono font-bold ${themeClasses.text}`}>
                     {key === ' ' ? '␣' : key.toUpperCase()}
                   </div>
                   <div className={`text-xs font-semibold ${
