@@ -13,8 +13,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sv">
-      <body className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white">
-        <div className="min-h-screen flex flex-col">
+      <body
+        className="min-h-screen text-white relative"
+        style={{
+          backgroundImage: "url('/images/backgrounds/Generated Image February 02, 2026 - 8_59PM.jpeg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        {/* Background overlay for better text readability */}
+        <div className="fixed inset-0 bg-black/40 z-0"></div>
+        <div className="min-h-screen flex flex-col relative z-10">
           <header className="bg-black/20 backdrop-blur-sm border-b border-white/10 p-4">
             <div className="max-w-6xl mx-auto">
               <h1 className="text-2xl md:text-3xl font-bold text-center">
