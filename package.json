@@ -1,7 +1,7 @@
 {
-  "name": "sjosatt-1917",
+  "name": "folkes-tangentbords-traning",
   "version": "1.0.0",
-  "description": "A modern web-based keyboard training game with progressive learning, gamification, and multiplayer features",
+  "description": "Folkes moderna webbaserade tangentbordsträningsspel med progressiv lärning, gamification och multiplayer",
   "author": "Claude Code Assistant",
   "license": "MIT",
   "keywords": ["typing", "keyboard", "training", "game", "education", "multiplayer", "nextjs", "react"],

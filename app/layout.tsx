@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tangentbordsträning - Sjösätt 1917",
-  description: "Ett webbaserat tangentbordsträningsspel med progressiv träning och gamification",
+  title: "Folkes Tangentbords Träning",
+  description: "Folkes webbaserade tangentbordsträningsspel med progressiv träning och gamification",
 };
 
 export default function RootLayout({
@@ -18,10 +18,10 @@ export default function RootLayout({
           <header className="bg-black/20 backdrop-blur-sm border-b border-white/10 p-4">
             <div className="max-w-6xl mx-auto">
               <h1 className="text-2xl md:text-3xl font-bold text-center">
-                🎯 Tangentbordsträning
+                🎯 Folkes Tangentbords Träning
               </h1>
               <p className="text-center text-blue-200 mt-2">
-                Sjösätt 1917 - Träna dina fingrar!
+                Träna dina fingrar med Folke!
               </p>
             </div>
           </header>
@@ -31,7 +31,7 @@ export default function RootLayout({
             </div>
           </main>
           <footer className="bg-black/20 backdrop-blur-sm border-t border-white/10 p-4 text-center text-sm text-blue-200">
-            <p>© 2026 Sjösätt 1917 - Byggd med Next.js och TypeScript</p>
+            <p>© 2026 Folkes Tangentbords Träning - Byggd med Next.js och TypeScript</p>
           </footer>
         </div>
       </body>
