@@ -31,9 +31,6 @@ export default function RootLayout({
               <h1 className="text-2xl md:text-3xl font-bold text-center">
                 🎯 Folkes Tangentbords Träning
               </h1>
-              <p className="text-center text-blue-200 mt-2">
-                Träna dina fingrar med Folke!
-              </p>
             </div>
           </header>
           <main className="flex-1 p-4">

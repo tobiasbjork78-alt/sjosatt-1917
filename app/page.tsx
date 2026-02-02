@@ -15,6 +15,7 @@ import { useSupabaseSync } from '@/hooks/useSupabaseSync';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useTheme } from '@/hooks/useTheme';
 import { useMultiplayer } from '@/hooks/useMultiplayer';
+import { useMusicMode } from '@/hooks/useMusicMode';
 import { GameMode } from '@/types/game';
 import { useState, useEffect } from 'react';
 
@@ -26,6 +27,7 @@ const GAME_MODES: { key: GameMode; label: string; icon: string; description: str
   { key: 'swedish', label: 'Svenska', icon: '🇸🇪', description: 'Svenska texter' },
   { key: 'numbers', label: 'Siffror', icon: '🔢', description: 'Siffror och tal' },
   { key: 'symbols', label: 'Symboler', icon: '⚡', description: 'Specialtecken' },
+  { key: 'beat', label: 'Beat Mode', icon: '🎵', description: 'Hemrader + synthwave toner' },
 ];
 
 export default function Home() {
@@ -69,6 +71,7 @@ export default function Home() {
 
   const { playSound, toggleSound, isSoundEnabled } = useSoundEffects();
   const { currentTheme, changeTheme, getAllThemes, getThemeClasses } = useTheme();
+  const { config: musicConfig, playTone, playBonusChord, toggleBeatMode, isMusicalKey, isSupported: isMusicSupported } = useMusicMode();
 
   const {
     currentRoom,
@@ -135,10 +138,17 @@ export default function Home() {
     }
   }, [currentUser, isOnline, loadProgress]);
 
-  // Play sound effects based on game events
+  // Play sound effects and music based on game events
   useEffect(() => {
     if (lastKeyCorrect === true) {
+      // Regular sound effects
       playSound('keypress');
+
+      // Beat Mode: Play musical tones
+      if (gameMode === 'beat' && gameState.currentIndex > 0) {
+        const currentKey = gameState.currentText[gameState.currentIndex - 1];
+        playTone(currentKey, true, gameState.stats.currentCombo);
+      }
 
       // Play combo sound for significant combos
       if (gameState.stats.currentCombo > 0 && gameState.stats.currentCombo % 10 === 0) {
@@ -146,8 +156,13 @@ export default function Home() {
       }
     } else if (lastKeyCorrect === false) {
       playSound('error');
+
+      // Beat Mode: Play dissonant tone for wrong keys
+      if (gameMode === 'beat') {
+        playTone('', false, 0);
+      }
     }
-  }, [lastKeyCorrect, gameState.stats.currentCombo, playSound]);
+  }, [lastKeyCorrect, gameState.stats.currentCombo, gameState.currentIndex, gameState.currentText, gameMode, playSound, playTone]);
 
   // Play success sound when game ends
   useEffect(() => {
@@ -174,7 +189,12 @@ export default function Home() {
 
   const themeClasses = getThemeClasses();
 
-  // Handle game mode keyboard shortcuts (1-7 keys and Enter)
+  // Enable/disable beat mode based on selected game mode
+  useEffect(() => {
+    toggleBeatMode(gameMode === 'beat');
+  }, [gameMode, toggleBeatMode]);
+
+  // Handle game mode keyboard shortcuts (1-8 keys and Enter)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Only handle shortcuts when game is not active
@@ -182,8 +202,8 @@ export default function Home() {
 
       const key = event.key;
 
-      // Handle number keys 1-7 for game mode selection
-      if (key >= '1' && key <= '7') {
+      // Handle number keys 1-8 for game mode selection
+      if (key >= '1' && key <= '8') {
         const modeIndex = parseInt(key) - 1;
         if (modeIndex < GAME_MODES.length) {
           setGameMode(GAME_MODES[modeIndex].key);
@@ -216,14 +236,21 @@ export default function Home() {
                 onClick={() => setGameMode(mode.key)}
                 className={`p-3 rounded-lg border-2 transition-all duration-200 text-center ${
                   gameMode === mode.key
-                    ? `border-blue-400 bg-blue-500/20 ${themeClasses.text}`
+                    ? mode.key === 'beat'
+                      ? `border-purple-400 bg-purple-500/20 ${themeClasses.text} animate-pulse`
+                      : `border-blue-400 bg-blue-500/20 ${themeClasses.text}`
                     : `border-white/20 bg-white/5 ${themeClasses.accent} hover:border-white/40 hover:bg-white/10`
-                }`}
+                } ${mode.key === 'beat' ? 'relative overflow-hidden' : ''}`}
               >
                 <div className="text-2xl mb-1">{mode.icon}</div>
                 <div className="font-bold text-sm">{mode.label}</div>
                 <div className="text-xs opacity-80">{mode.description}</div>
                 <div className="text-xs opacity-60 mt-1">Tryck {index + 1}</div>
+                {mode.key === 'beat' && (
+                  <div className="text-xs text-purple-400 mt-1 flex items-center justify-center">
+                    {isMusicSupported ? '🎶 Music Ready' : '❌ No Audio'}
+                  </div>
+                )}
               </button>
             ))}
           </div>
@@ -464,10 +491,11 @@ export default function Home() {
         <div className={`${themeClasses.card} rounded-lg p-4`}>
           <h3 className={`font-bold ${themeClasses.text} mb-2`}>📚 Instruktioner</h3>
           <div className={`text-sm ${themeClasses.accent} space-y-1`}>
-            <p>• Välj ett träningsläge (tryck 1-7)</p>
+            <p>• Välj ett träningsläge (tryck 1-8)</p>
             <p>• Tryck Enter eller &quot;Starta&quot; för att börja</p>
             <p>• Följ färgkodningen på tangentbordet</p>
             <p>• Få 90%+ noggrannhet 2 gånger i rad för nästa nivå</p>
+            <p>• 🎵 Beat Mode: Hemrader spelar synthwave-toner!</p>
           </div>
         </div>
 

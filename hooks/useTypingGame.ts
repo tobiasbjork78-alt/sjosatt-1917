@@ -79,6 +79,17 @@ export function useTypingGame() {
           symbolWords[Math.floor(Math.random() * symbolWords.length)]
         ).join(' ');
 
+      case 'beat':
+        // Beat Mode: Focus on home row keys for musical experience
+        const beatTexts = [
+          'asdf jkl;', // Basic home row
+          'asdf asdf jkl; jkl;', // Repetitive for rhythm
+          'a s d f j k l ;', // Spaced for clear notes
+          'asdfjkl; asdfjkl;', // Continuous flow
+          'asdf jkl; asdf jkl; asdf jkl;', // Pattern building
+        ];
+        return beatTexts[Math.min(level - 1, beatTexts.length - 1)] || beatTexts[0];
+
       default:
         return HOMEROW_TEXTS[0];
     }

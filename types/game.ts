@@ -28,7 +28,7 @@ export interface GameState {
   score: number;
 }
 
-export type GameMode = 'homerow' | 'words' | 'sentences' | 'code' | 'swedish' | 'numbers' | 'symbols';
+export type GameMode = 'homerow' | 'words' | 'sentences' | 'code' | 'swedish' | 'numbers' | 'symbols' | 'beat';
 
 export interface KeyboardKey {
   key: string;
