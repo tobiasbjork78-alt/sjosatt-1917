@@ -1,0 +1,34 @@
+{
+  "name": "sjosatt-1917",
+  "version": "1.0.0",
+  "description": "A modern web-based keyboard training game with progressive learning, gamification, and multiplayer features",
+  "author": "Claude Code Assistant",
+  "license": "MIT",
+  "keywords": ["typing", "keyboard", "training", "game", "education", "multiplayer", "nextjs", "react"],
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "deploy": "vercel --prod",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.93.3",
+    "next": "15.5.11",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8",
+    "eslint-config-next": "15.5.11",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
