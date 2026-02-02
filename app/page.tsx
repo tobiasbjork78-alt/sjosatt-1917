@@ -36,6 +36,7 @@ export default function Home() {
     nextKey,
     progress,
     problematicKeys,
+    consecutiveGoodGames,
     startGame,
     resetGame,
     togglePause,
@@ -322,6 +323,11 @@ export default function Home() {
         <div className={`${themeClasses.card} rounded-lg p-4 text-center`}>
           <div className="text-2xl font-bold text-purple-400">{gameState.level}</div>
           <div className={`text-sm ${themeClasses.accent}`}>Nivå</div>
+          {consecutiveGoodGames > 0 && (
+            <div className="text-xs text-green-400 mt-1">
+              {consecutiveGoodGames}/2 för nästa nivå
+            </div>
+          )}
         </div>
         <div className={`${themeClasses.card} rounded-lg p-4 text-center`}>
           <div className={`text-2xl font-bold ${themeClasses.warning}`}>{gameState.score}</div>
@@ -461,7 +467,7 @@ export default function Home() {
             <p>• Välj ett träningsläge (tryck 1-7)</p>
             <p>• Tryck Enter eller &quot;Starta&quot; för att börja</p>
             <p>• Följ färgkodningen på tangentbordet</p>
-            <p>• Sikta på 85%+ noggrannhet för att gå upp i nivå</p>
+            <p>• Få 90%+ noggrannhet 2 gånger i rad för nästa nivå</p>
           </div>
         </div>
 

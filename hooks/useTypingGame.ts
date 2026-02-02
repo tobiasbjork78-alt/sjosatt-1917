@@ -33,6 +33,7 @@ export function useTypingGame() {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [gameMode, setGameMode] = useState<GameMode>('homerow');
   const [lastKeyCorrect, setLastKeyCorrect] = useState<boolean | undefined>(undefined);
+  const [consecutiveGoodGames, setConsecutiveGoodGames] = useState<number>(0);
 
   // Generate text based on game mode
   const generateText = useCallback((mode: GameMode, level: number): string => {
@@ -195,6 +196,7 @@ export function useTypingGame() {
   const resetGame = useCallback(() => {
     setGameState(initialGameState);
     setLastKeyCorrect(undefined);
+    setConsecutiveGoodGames(0);
   }, []);
 
   // Pause/Resume game
@@ -244,19 +246,31 @@ export function useTypingGame() {
         const finalWpm = gameState.stats.wpm;
         const finalAccuracy = gameState.stats.accuracy;
 
-        // Level up if performance is good
+        // Level up logic: Need 90%+ accuracy 2 times in a row
         setTimeout(() => {
-          const shouldLevelUp = finalWpm >= 15 + (gameState.level * 5) && finalAccuracy >= 85;
+          const isGoodGame = finalAccuracy >= 90;
+          let newConsecutiveGoodGames = isGoodGame ? consecutiveGoodGames + 1 : 0;
+
+          setConsecutiveGoodGames(newConsecutiveGoodGames);
+
+          const shouldLevelUp = newConsecutiveGoodGames >= 2;
+
           if (shouldLevelUp) {
             setGameState(prev => ({
               ...prev,
               level: prev.level + 1,
             }));
+            setConsecutiveGoodGames(0); // Reset after level up
           }
 
-          const message = shouldLevelUp
-            ? `Utmärkt! Nivå ${gameState.level + 1} upplåst!\nWPM: ${finalWpm}\nNoggrannhet: ${finalAccuracy}%`
-            : `Bra jobbat!\nWPM: ${finalWpm}\nNoggrannhet: ${finalAccuracy}%\nTräna mer för att nå nästa nivå!`;
+          let message = '';
+          if (shouldLevelUp) {
+            message = `🎉 NIVÅ UPPNÅDD! ${gameState.level + 1}!\n\n2 spel i rad med 90%+ noggrannhet!\nWPM: ${finalWpm}\nNoggrannhet: ${finalAccuracy}%`;
+          } else if (isGoodGame) {
+            message = `✨ Utmärkt spel! ${finalAccuracy}% noggrannhet!\n\n${newConsecutiveGoodGames}/2 bra spel för nästa nivå\nWPM: ${finalWpm}`;
+          } else {
+            message = `Bra jobbat!\nWPM: ${finalWpm}\nNoggrannhet: ${finalAccuracy}%\n\nBehöver 90%+ noggrannhet 2 gånger i rad för nästa nivå`;
+          }
 
           alert(message);
         }, 100);
@@ -297,6 +311,7 @@ export function useTypingGame() {
     nextKey,
     progress,
     problematicKeys,
+    consecutiveGoodGames,
     startGame,
     resetGame,
     togglePause,
